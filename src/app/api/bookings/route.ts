@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     .single<{ role: string }>();
 
   const isAdmin = profile?.role === "admin" || profile?.role === "frontdesk";
-  const bookings = await getBookings(supabase, isAdmin ? undefined : user.id);
+  const bookings = await getBookings(supabase as any, isAdmin ? undefined : user.id);
   return NextResponse.json(bookings);
 }
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const adminClient = createAdminClient();
 
-  const booking = await createBooking(adminClient, {
+  const booking = await createBooking(adminClient as any, {
     user_id: user.id,
     service: body.service,
     room_id: body.room_id ?? null,
