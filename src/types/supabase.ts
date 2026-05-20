@@ -598,3 +598,5 @@ export const Constants = {
     },
   },
 } as const
+
+export type AppUser = Database["public"]["Tables"]["profiles"]["Row"];
