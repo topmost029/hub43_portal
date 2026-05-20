@@ -3,34 +3,31 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAllUsers } from "@/lib/db";
 
-// GET /api/users
 export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single<{ role: string }>();
   if (!["admin", "frontdesk"].includes(profile?.role ?? "")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const users = await getAllUsers(supabase);
+  const users = await getAllUsers(supabase as any);
   return NextResponse.json(users);
 }
 
-// POST /api/users — admin creates a new user (member or frontdesk)
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single<{ role: string }>();
   if (profile?.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await request.json();
   const adminClient = createAdminClient();
 
-  // Create the Supabase auth user
   const { data: newUser, error: authError } = await adminClient.auth.admin.createUser({
     email: body.email,
     password: body.password,
@@ -42,7 +39,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authError?.message ?? "Failed to create user" }, { status: 400 });
   }
 
-  // Update profile with role, name, phone
   const { data: updatedProfile, error: profileError } = await adminClient
     .from("profiles")
     .update({
