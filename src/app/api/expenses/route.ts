@@ -8,12 +8,12 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single<{ role: string }>();
   if (!["admin", "frontdesk"].includes(profile?.role ?? "")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const expenses = await getExpenses(supabase);
+  const expenses = await getExpenses(supabase as any);
   return NextResponse.json(expenses);
 }
 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single<{ role: string }>();
   if (!["admin", "frontdesk"].includes(profile?.role ?? "")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const adminClient = createAdminClient();
 
-  const expense = await createExpense(adminClient, {
+  const expense = await createExpense(adminClient as any, {
     date: body.date,
     category: body.category,
     description: body.description,
