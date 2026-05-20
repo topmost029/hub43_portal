@@ -1,3 +1,6 @@
+Change `.single()` to `.single<{ role: string }>()`:
+
+```ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -16,7 +19,7 @@ export async function PATCH(
     .from("profiles")
     .select("role")
     .eq("id", user.id)
-    .single();
+    .single<{ role: string }>();
 
   if (profile?.role !== "admin") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -31,3 +34,6 @@ export async function PATCH(
 
   return NextResponse.json(booking);
 }
+```
+
+That's the only change — line 18, `.single<{ role: string }>()`. Save, commit, push.
