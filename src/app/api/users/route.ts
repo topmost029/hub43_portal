@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authError?.message ?? "Failed to create user" }, { status: 400 });
   }
 
-  const { data: updatedProfile, error: profileError } = await adminClient
+  const { data: updatedProfile, error: profileError } = await (adminClient as any)
     .from("profiles")
     .update({
       name: body.name,
