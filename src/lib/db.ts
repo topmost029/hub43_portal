@@ -234,7 +234,7 @@ export const getSetting = async <T = unknown>(db: DB, key: string): Promise<T | 
   return data.value as T;
 };
 
-export const setSetting = async (db: DB, key: string, value: unknown) => {
+export const setSetting = async (db: DB, key: string, value: Json) => {
   const { error } = await db
     .from("app_settings")
     .upsert({ key, value, updated_at: new Date().toISOString() });
