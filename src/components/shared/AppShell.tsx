@@ -95,8 +95,8 @@ export default function AppShell({ initialUser }: AppShellProps) {
     if (user.role === "frontdesk") {
       switch (active) {
         case "fd_onboard":   return <FrontDeskOnboard user={user} />;
-        case "fd_checkins":  return <FrontDeskCheckins />;
-        case "fd_members":   return <FrontDeskMembers />;
+        case "fd_checkins":  return <FrontDeskCheckins user={user} />;
+        case "fd_members":   return <FrontDeskMembers user={user} />;
         case "expenses":     return <FrontDeskExpenses user={user} />;
         case "fd_account":   return <FrontDeskAccount user={user} />;
         default:             return <FrontDeskOnboard user={user} />;
