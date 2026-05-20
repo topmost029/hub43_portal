@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createBooking, createInvoice, getBookings } from "@/lib/db";
-import { genId, todayISO } from "@/lib/utils";
+import { createBooking, getBookings } from "@/lib/db";
+import { todayISO } from "@/lib/utils";
 
 // GET /api/bookings — returns bookings scoped to the caller's role
 export async function GET(request: NextRequest) {
@@ -10,9 +10,13 @@ export async function GET(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-  const isAdmin = profile?.role === "admin" || profile?.role === "frontdesk";
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single<{ role: string }>();
 
+  const isAdmin = profile?.role === "admin" || profile?.role === "frontdesk";
   const bookings = await getBookings(supabase, isAdmin ? undefined : user.id);
   return NextResponse.json(bookings);
 }
