@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     })
     .eq("id", newUser.user.id)
     .select()
-    .single<any>();
+    .single();
 
   if (profileError) {
     return NextResponse.json({ error: profileError.message }, { status: 400 });
